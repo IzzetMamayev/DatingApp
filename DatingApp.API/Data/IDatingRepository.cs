@@ -10,10 +10,18 @@ namespace DatingApp.API.Data
         void Add<T>(T entity) where T: class;
         void Delete<T>(T entity) where T: class;
         Task<bool> SaveAll(); 
-        Task<IEnumerable<User>> GetUsers();      // <PagedList<User>> -> (nujen dlya pagination),  (UserParams userParams) -> parametr nujen dlya pagination takje
+        Task<PagedList<User>> GetUsers(UserParams userParams);  //<IEnumerable<User>>    // <PagedList<User>> -> (nujen dlya pagination),  (UserParams userParams) -> parametr nujen dlya pagination takje
         Task<User> GetUser(int id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUser(int userId);
+        Task<Like> GetLike(int userId, int recipientId);
+
+
+        //For messaging
+        Task<Message> GetMessage(int id);
+
+
+
 
 
     }

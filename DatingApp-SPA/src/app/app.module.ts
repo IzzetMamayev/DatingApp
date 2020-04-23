@@ -8,7 +8,7 @@ import { NgxGalleryModule } from "@kolkov/ngx-gallery";
 
 
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { BsDropdownModule, TabsModule} from "ngx-bootstrap";
+import { BsDropdownModule, TabsModule, PaginationModule} from "ngx-bootstrap";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 
 import { AppComponent } from "./app.component";
@@ -24,7 +24,11 @@ import { MemberListComponent } from "./members/member-list/member-list.component
 import { MemberCardComponent } from "./members/member-card/member-card.component";
 import { MemberEditComponent } from "./members/member-edit/member-edit.component";
 import { MemberDetailComponent } from "./members/member-detail/member-detail.component";
+
 import { MemberDetailResolver } from "./_resolvers/member-detail.resolver";
+import { MemberEditResolver } from "./_resolvers/member-edit.resolver";
+import { MemberListResolver } from "./_resolvers/member-list.resolver";
+import { ListsResolver } from './_resolvers/lists.resolver';
 
 import { AuthService } from "./_services/auth.service";
 import { appRoutes } from "./routes";
@@ -32,10 +36,11 @@ import { JwtModule } from "@auth0/angular-jwt";
 import { AlertifyService } from "./_services/alertify.service";
 import { AuthGuard } from "./_guards/auth.guard";
 // import { NgxGalleryModule } from "@nomadreservations/ngx-gallery";
-import { MemberEditResolver } from "./_resolvers/member-edit.resolver";
+
 import { PreventUnsavedChanges } from "./_guards/prevent-unsaved-changes.guard";
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { TimeagoModule } from 'ngx-timeago';
+
 // import { TimeAgoPipe } from 'time-ago-pipe';
 
 export function tokenGetter() {
@@ -75,6 +80,7 @@ export class CustomHammerConfig extends HammerGestureConfig {
     BrowserAnimationsModule,
     FileUploadModule,
     NgxGalleryModule,
+    PaginationModule.forRoot(),
     BsDatepickerModule.forRoot(),
     TabsModule.forRoot(),
     BsDropdownModule.forRoot(),
@@ -94,8 +100,10 @@ export class CustomHammerConfig extends HammerGestureConfig {
     AlertifyService,
     AuthGuard,
     UserService,
+    MemberListResolver,
     MemberDetailResolver,
     MemberEditResolver,
+    ListsResolver,
     PreventUnsavedChanges,
     { provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig }
   ],

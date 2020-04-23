@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,11 @@ namespace DatingApp.API.Data
             _context.Remove(entity);
         }
 
+        public async Task<Like> GetLike(int userId, int recipientId)
+        {
+            return await _context.Likes.FirstOrDefaultAsync(u => u.LikerId == userId && u.LikeeId == recipientId);
+        }
+
         public async Task<Photo> GetMainPhotoForUser(int userId)
         {
             return await _context.Photos.Where(u => u.UserId == userId).FirstOrDefaultAsync(p => p.IsMain);
@@ -43,31 +49,76 @@ namespace DatingApp.API.Data
             return user;
         }
 
-        public async Task<IEnumerable<User>> GetUsers()    //<PagedList<User>> GetUsers ->(dlya Pagination nujno)   (UserParams userParams) -> parametr takje nujen dlya Pagination
+
+        public async Task<PagedList<User>> GetUsers(UserParams userParams)  //<IEnumerable<User>>   //<PagedList<User>> GetUsers ->(dlya Pagination nujno)   (UserParams userParams) -> parametr takje nujen dlya Pagination
         {
 
-            var users =  await _context.Users.Include(p => p.Photos).ToListAsync();
+            var users = _context.Users.Include(p => p.Photos).OrderByDescending(u =>u.LastActive).AsQueryable();
 
-            return users;
+            users = users.Where(u => u.Id != userParams.UserId);
+            users = users.Where(u => u.Gender == userParams.Gender);
 
-            //Nijnaya cast zakomentena tak kak pagination poka ne poluchilsa
-            // var users =  _context.Users.Include(p => p.Photos);
-            // return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize); 
+            if(userParams.Likers)
+            {
+                var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u =>userLikers.Contains(u.Id));
+            }
+
+            if(userParams.Likees)
+            {
+                var userLikees = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u =>userLikees.Contains(u.Id));
+            }
+
+            if(userParams.MinAge != 18 || userParams.MaxAge != 99) {
+                var minDateOfBirth = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+                var maxDateOfBirth = DateTime.Today.AddYears(-userParams.MinAge);
+
+                users = users.Where(u => u.DateOfBirth >= minDateOfBirth && u.DateOfBirth <= maxDateOfBirth);
+            }
+
+            if(!string.IsNullOrEmpty(userParams.OrderBy)) 
+            {
+                switch (userParams.OrderBy)
+                {
+                    case "created":
+                        users = users.OrderByDescending(u=>u.Created);
+                        break;
+                    default:
+                        users = users.OrderByDescending(u=>u.LastActive);
+                        break;
+                }
+            }
+
+            return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
         }
 
-        // DO PAGINATION METOD GetUsers VIQLADEL TAKIM OBRAZOM
-        // public async Task<IEnumerable<User>> GetUsers()
-        // {
-        //     var users = await _context.Users.Include(p => p.Photos).ToListAsync();
+        private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
+        {
+            var user = await _context.Users
+                .Include(x => x.Likers)
+                .Include(x => x.Likees)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
-        //     return users;
-        // }
+            if (likers) 
+            {
+                return user.Likers.Where(u => u.LikeeId == id).Select(i => i.LikerId);
+            }
+            else 
+            {
+                return user.Likees.Where(u => u.LikerId == id).Select(i => i.LikeeId); 
+            }
+        }
+
 
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
         }
-        
 
-     }
+        public Task<Message> GetMessage(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }
