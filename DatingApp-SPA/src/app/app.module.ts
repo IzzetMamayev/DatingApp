@@ -8,7 +8,7 @@ import { NgxGalleryModule } from "@kolkov/ngx-gallery";
 
 
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { BsDropdownModule, TabsModule, PaginationModule} from "ngx-bootstrap";
+import { BsDropdownModule, TabsModule, PaginationModule, ButtonsModule} from "ngx-bootstrap";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 
 import { AppComponent } from "./app.component";
@@ -40,6 +40,8 @@ import { AuthGuard } from "./_guards/auth.guard";
 import { PreventUnsavedChanges } from "./_guards/prevent-unsaved-changes.guard";
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { TimeagoModule } from 'ngx-timeago';
+import { MessagesResolver } from './_resolvers/messages.resolver';
+import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
 
 // import { TimeAgoPipe } from 'time-ago-pipe';
 
@@ -66,7 +68,8 @@ export class CustomHammerConfig extends HammerGestureConfig {
     MemberCardComponent,
     MemberDetailComponent,
     MemberEditComponent,
-    PhotoEditorComponent
+    PhotoEditorComponent,
+    MemberMessagesComponent
     // TimeAgoPipe
     
   ],
@@ -79,6 +82,7 @@ export class CustomHammerConfig extends HammerGestureConfig {
     FormsModule,
     BrowserAnimationsModule,
     FileUploadModule,
+    ButtonsModule,
     NgxGalleryModule,
     PaginationModule.forRoot(),
     BsDatepickerModule.forRoot(),
@@ -105,6 +109,7 @@ export class CustomHammerConfig extends HammerGestureConfig {
     MemberEditResolver,
     ListsResolver,
     PreventUnsavedChanges,
+    MessagesResolver,
     { provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig }
   ],
   
